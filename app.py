@@ -1,4 +1,5 @@
 import streamlit as st
+import snowflake-snowpark-python
 
 # Initialize connection.
 conn = st.experimental_connection("snowpark", type="snowpark")
