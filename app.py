@@ -1,46 +1,16 @@
 import streamlit as st
-import snowflake.connector 
-from urllib.error import URLError 
 
-def init_connection():
-    return snowflake.connector.connect(**st.secrets["snowflake"])
+# Initialize connection.
+conn = st.experimental_connection("snowpark", type="snowpark")
 
-my_cnx = init_connection()
+# Load the table as a dataframe using the Snowpark Session.
+@st.cache_data
+def load_table():
+    with conn.safe_session() as session:
+        return session.table('mytable').to_pandas()
 
-def snowflake_command(my_command):
-    my_cur = my_cnx.cursor()
-    try:
-      result=my_cur.execute(my_command)
-      st.markdown('It seems to have worked. Check Snowflake under Data->Private Sharing to see if the Exchange listings appear.')
-    except:
-      st.write('Are you certain you entered you account locator correctly?')
-      st.write('And, are you certain your account is on the AWS cloud, in the West region?')
-    return 
+df = load_table()
 
-st.title('You are cordially invited to...')
-st.header('The Bridge 2023 Private Exchange')
-st.text('Powered by Snowflake')
- 
-current_region_function = "https://learn.snowflake.com/asset-v1:snowflake+X+X+type@asset+block@current_region_us_west_2.png"
-st.image(current_region_function)
-
-st.markdown('Only accounts in the AWS West Region (as shown above) can be added to the Bridge-2023 Private Exchange. This exchange was set up so that all learners can efficiently consume and provide data on the private exchange set up for the workshop, today.')
-
- 
-current_account_function = "https://learn.snowflake.com/asset-v1:snowflake+ESS-SMEW+C+type@asset+block@current_account_function.png"
-st.image(current_account_function)
-
-my_account_locator = st.text_input('After running the CURRENT_ACCOUNT function, paste your Account Locator in the field below.', 'abc12345')
-
-
-#st.stop()
-
-if st.button('Add My Account to the Bridge-2023 Exchange'):
-     try:
-        command_to_add_account = ('CALL STREAMLIT_INPUT.ST_FORM_DATA.SP_ADD_AL_TO_BRIDGE_DX(\''+ my_account_locator+'\')')
-        #st.write(command_to_add_account)
-        my_result=snowflake_command(command_to_add_account)   
-     except URLError as e:
-        st.error()
-else:
-     st.write()
+# Print results.
+for row in df.itertuples():
+    st.write(f"{row.NAME} has a :{row.PET}:")
