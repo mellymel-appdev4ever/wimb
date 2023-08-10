@@ -1,5 +1,6 @@
 import streamlit as st
-import snowflake-snowpark-python 
+from snowflake.snowpark.session import Session
+from snowflake.snowpark.functions import col
 
 # Initialize connection.
 conn = st.experimental_connection("snowpark", type="snowpark")
