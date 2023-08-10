@@ -1,9 +1,11 @@
 import streamlit as st
-from snowflake.snowpark.session import Session
-from snowflake.snowpark.functions import col
+#from snowflake.snowpark.session import Session
+#from snowflake.snowpark.functions import col
 
 # Initialize connection.
 conn = st.experimental_connection("snowpark", type="snowpark")
+
+st.stop()
 
 # Load the table as a dataframe using the Snowpark Session.
 @st.cache_data
